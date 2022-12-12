@@ -19,6 +19,7 @@ function build() {
     -lc++ \
     -no_uuid \
     -lSystem \
+    -no_adhoc_codesign \
     "$(xcode-select -p)"/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/*/lib/darwin/libclang_rt.iossim.a \
     -F. \
     "$@"
@@ -30,7 +31,7 @@ mkdir -p /tmp/bins2
 build -o /tmp/bins2/first
 build -o /tmp/bins2/second
 
-if diff -Nur <(xxd /tmp/bins2/first) <(xxd /tmp/bins2/second); then
+if diff -Nur <(otool -X -v -s __TEXT __objc_methname /tmp/bins2/first) <(otool -X -v -s __TEXT __objc_methname /tmp/bins2/second); then
   echo "NO DIFF!! Running again more times to be sure"
 else
   echo "HAS DIFF, something was non deterministic!"
